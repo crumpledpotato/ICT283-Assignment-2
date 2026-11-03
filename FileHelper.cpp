@@ -25,7 +25,7 @@ bool FileHelper::SelectFile (string& filename, int& wastCol, int& speedCol, int&
     return FindColumn(filename, wastCol, speedCol, TCol, SRCol);
 }
 
-bool FileHelper::FindColumn (string filename, int& wastCol, int& speedCol, int& TCol, int& SRCol)
+bool FileHelper::FindColumn (const string& filename, int& wastCol, int& speedCol, int& TCol, int& SRCol)
 {
     // Open CSV file
     ifstream infile(filename);
@@ -89,7 +89,7 @@ bool FileHelper::FindColumn (string filename, int& wastCol, int& speedCol, int& 
     return true;
 }
 
-bool FileHelper::ReadData(const string filename, int wastCol, int speedCol, int TCol, int SRCol, WeatherlogType& weather_data)
+bool FileHelper::ReadData(const string& filename, int wastCol, int speedCol, int TCol, int SRCol, WeatherlogType& weather_data)
 {
     ifstream infile(filename);
     if (!infile)
@@ -112,6 +112,11 @@ bool FileHelper::ReadData(const string filename, int wastCol, int speedCol, int 
             continue;
         }
 
+        if (RecordExists(weather_data, record))
+        {
+            cout << endl << "Duplicate record found - skipped" << endl;
+            continue;
+        }
         weather_data.Insert(weather_data.Size(), record);
     }
     infile.close();
@@ -207,8 +212,8 @@ bool FileHelper::ParseDateTime(const std::string& wast, Date& date, Time& time)
         return false;
     }
 
-    if (month < 1 || month > 12 || day < 1 || day > 31 || hour < 0 || hour > 23 ||
-            minute < 0 || minute > 59)
+    if (year < 1 || month < 1 || month > 12 || day < 1 || day > 31 ||
+        hour < 0 || hour > 23 || minute < 0 || minute > 59)
     {
         return false;
     }
@@ -288,4 +293,32 @@ bool FileHelper::ParseRecord(const std::string& line, int wastCol, int speedCol,
     record.SetSolarRad(solarRadValue);
 
     return true;
+}
+
+bool FileHelper::RecordExists(const WeatherlogType& weather_data, const WeatherRecType& record)
+{
+    Date recordDate;
+    Time recordTime;
+
+    record.GetDate(recordDate);
+    record.GetTime(recordTime);
+
+    for (int i = 0; i < weather_data.Size(); i++)
+    {
+        Date existingDate;
+        Time existingTime;
+
+        weather_data[i].GetDate(existingDate);
+        weather_data[i].GetTime(existingTime);
+
+        if (recordDate.GetDay() == existingDate.GetDay() &&
+            recordDate.GetMonth() == existingDate.GetMonth() &&
+            recordDate.GetYear() == existingDate.GetYear() &&
+            recordTime.GetHour() == existingTime.GetHour() &&
+            recordTime.GetMinute() == existingTime.GetMinute())
+        {
+            return true;
+        }
+    }
+    return false;
 }
