@@ -1,0 +1,19 @@
+
+# Code::Blocks build output
+bin/
+obj/
+*.exe
+*.o
+*.a
+
+# Code::Blocks user-specific files
+*.depend
+*.layout
+
+# Doxygen generated output
+doxygen/html/
+doxygen/latex/
+
+# Windows temporary files
+Thumbs.db
+*.tmp
