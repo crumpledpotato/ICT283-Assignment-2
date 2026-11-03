@@ -1,5 +1,7 @@
 #include "FileHelper.h"
 #include "MathHelper.h"
+#include "SortHelper.h"
+#include "DataHelper.h"
 #include "WeatherRecType.h"
 #include "BST.h"
 
@@ -32,19 +34,6 @@ int Menu();
  * @param weather_data The stored weather records
  */
 void ProcessMenu(const WeatherlogType& weather_data);
-
-/**
- * @brief Organises weather records into yearly Binary Search Trees
- *
- * Reads weather records from the Vector and inserts each record into the BST associated with its year
- *
- * The map uses the year as its key, while each BST orders records chronologically by Date and Time <br>
- * Duplicate timestamps are rejected by the BST
- *
- * @param weather_data Vector containing weather records
- * @param weatherMap Map associating years with weather BSTs
- */
-void BuildWeatherMap(const WeatherlogType& weather_data, map<int, BinarySearchTree<WeatherRecType>>& weatherMap);
 
 int main()
 {
@@ -87,7 +76,7 @@ int main()
     }
     infile.close();
 
-    BuildWeatherMap(weather_data, weatherMap);
+    DataHelper::PrepareWeatherData(weather_data, weatherMap);
     cout << endl << "Number of years loaded : " << weatherMap.size() << endl;
     cout << endl << "Number of valid records : " << weather_data.Size() << endl;
 
@@ -149,20 +138,4 @@ void ProcessMenu(const WeatherlogType& weather_data)
         }
     }
     while (option != EXIT_PROGRAM);
-}
-
-void BuildWeatherMap(const WeatherlogType& weather_data, map<int, BinarySearchTree<WeatherRecType>>& weatherMap)
-{
-    for (int i = 0; i < weather_data.Size(); i++)
-    {
-        const WeatherRecType& record = weather_data[i];
-
-        Date date;
-        record.GetDate(date);
-
-        int year = 0;
-        date.GetYear(year);
-
-        weatherMap[year]; //.Insert(record);
-    }
 }
