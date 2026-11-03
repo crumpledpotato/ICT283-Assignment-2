@@ -1,5 +1,10 @@
+#include "FileHelper.h"
+#include "MathHelper.h"
+#include "WeatherRecType.h"
+
 #include <iostream>
 #include <string>
+#include <fstream>
 
 using namespace std;
 
@@ -24,34 +29,57 @@ int Menu();
  *
  * @param weather_data The stored weather records.
  */
-void ProcessMenu(WeatherlogType& weather_data);
+void ProcessMenu(const WeatherlogType& weather_data);
 
 int main()
 {
-    string filename;
+    WeatherlogType weather_data;
 
+    ifstream infile("data/data_source.txt");
+    if (!infile)
+    {
+        cout << "Unable to open data_source.txt" << endl;
+        return 1;
+    }
+
+    string filename;
     int wastCol;
     int speedCol;
     int TCol;
     int SRCol;
 
-    WeatherlogType weather_data;
-
-    if (FileHelper::SelectFile(filename, wastCol, speedCol, TCol, SRCol))
+    while (getline(infile, filename))
     {
-        if (FileHelper::ReadData(filename, wastCol, speedCol, TCol, SRCol, weather_data))
+        if (filename.empty())
         {
-            cout << "Number of valid records : " << weather_data.Size() << endl;
-            ProcessMenu(weather_data);
+            continue;
+        }
+        filename = "data/" + filename;
+        cout << endl << "Reading data file : " << filename << endl;
+
+        if (FileHelper::FindColumn(filename, wastCol, speedCol, TCol, SRCol))
+        {
+            if (!FileHelper::ReadData(filename, wastCol, speedCol, TCol, SRCol, weather_data))
+            {
+                cout << "Unable to read " << filename << endl;
+            }
         }
         else
         {
-            cout << endl << "Unable to read weather data" << endl;
+            cout << "Unable to find required columns in " << filename << endl;
         }
+    }
+    infile.close();
+
+    cout << endl << "Number of valid records : " << weather_data.Size() << endl;
+
+    if (weather_data.Size() > 0)
+    {
+        ProcessMenu(weather_data);
     }
     else
     {
-        cout << endl << "Unale to find the required data files or columns" << endl;
+        cout << "No valid weather records found" << endl;
     }
     return 0;
 }
