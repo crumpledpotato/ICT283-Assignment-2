@@ -128,14 +128,6 @@ public:
      */
     int Size() const;
 
-    /**
-     * @brief Performs a linear search to filter if any records are duplicated
-     *
-     * @param item Passes each new record by reference for comparison
-     * @return True if item matches past records, false if does not exist
-     */
-    bool Exists(const T& item) const;
-
 private:
 
     /**
@@ -340,20 +332,6 @@ int Vector<T>::Size() const
     return m_size;
 }
 
-// Exists
-template <class T>
-bool Vector<T>::Exists(const T& item) const
-{
-    for (int i = 0; i < m_size; i++)
-    {
-        if (m_vector[i] == item)
-        {
-            return true;
-        }
-    }
-    return false;
-}
-
 // Resize
 template <class T>
 void Vector<T>::Resize()
@@ -384,7 +362,7 @@ void Vector<T>::Resize()
     }
 
     delete[] m_vector;
-    m_vector = newVector;;;
+    m_vector = newVector;
     m_capacity = newCapacity;
 }
 
