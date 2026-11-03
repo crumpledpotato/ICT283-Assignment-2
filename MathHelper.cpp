@@ -44,7 +44,6 @@ float MathHelper::CalculateStdDeviation (const Vector<float>& values, float mean
 
 bool MathHelper::CalculateWindStats(const WeatherlogType& weather_data)
 {
-    int count = 0;
     int inputMonth;
     int inputYear;
     Vector<float> windSpeeds;
@@ -83,10 +82,9 @@ bool MathHelper::CalculateWindStats(const WeatherlogType& weather_data)
         if (recordMonth == inputMonth && recordYear == inputYear)
         {
             windSpeeds.Insert(windSpeeds.Size(), speed);
-            count++;
         }
     }
-    if (count == 0)
+    if (windSpeeds.Size() == 0)
     {
         cout << endl << "No matching records for " << inputMonth << " / " << inputYear << " found" << endl;
         return false;
@@ -124,46 +122,44 @@ bool MathHelper::CalculateTemperatureStats(const WeatherlogType& weather_data)
     cout << "==================================================" << endl;
     cout << endl << inputYear << endl << endl;
 
-    for (int month = 1; month <= 12 ; month++)
+    cout << fixed << setprecision(1);
+
+    Vector<float> monthlyTemperatures[12];
+    Date date;
+    float temperature;
+    int recordMonth;
+    int recordYear;
+
+    for (int i =0; i < weather_data.Size(); i++)
     {
-        Vector<float> temperatures;
+        const WeatherRecType& record = weather_data[i];
 
-        for (int i = 0; i < weather_data.Size(); i++)
+        record.GetDate(date);
+        record.GetTemperature(temperature);
+        date.GetMonth(recordMonth);
+        date.GetYear(recordYear);
+
+        if (recordYear == inputYear && recordMonth >= 1 && recordMonth <= 12)
         {
-            WeatherRecType record = weather_data[i];
-            Date date;
-            float temperature;
-
-            record.GetDate(date);
-            record.GetTemperature(temperature);
-
-            int recordMonth;
-            int recordYear;
-
-            date.GetMonth(recordMonth);
-            date.GetYear(recordYear);
-
-            if (recordMonth == month && recordYear == inputYear)
-            {
-                temperatures.Insert(temperatures.Size(), temperature);
-            }
+            monthlyTemperatures[recordMonth-1].Insert(
+                monthlyTemperatures[recordMonth - 1].Size(), temperature);
         }
+    }
 
-        if (temperatures.Size() > 0)
+    for (int month = 1; month <= 12; month++)
+    {
+        Date selectedDate (1, month, inputYear);
+        string monthName;
+        selectedDate.GetMonthName(monthName);
+
+        if (monthlyTemperatures[month - 1].Size() > 0)
         {
-            float mean = CalculateMean(temperatures);
-            float stdDeviation = CalculateStdDeviation(temperatures, mean);
-            Date selectedDate (1, month, inputYear);
-            string monthName;
-            selectedDate.GetMonthName(monthName);
-
+            float mean = CalculateMean(monthlyTemperatures[month - 1]);
+            float stdDeviation = CalculateStdDeviation(monthlyTemperatures[month - 1], mean);
             cout << left << setw(10) << monthName << " : " << mean << " degrees C," << "\t stdev : " << stdDeviation << endl;
         }
         else
         {
-            Date selectedDate (1, month, inputYear);
-            string monthName;
-            selectedDate.GetMonthName(monthName);
             cout << left << setw(10) << monthName << " : No Data" << endl;
         }
     }
@@ -186,21 +182,20 @@ bool MathHelper::CalculateSolarRad(const WeatherlogType& weather_data)
     cout << "==================================================" << endl;
     cout << endl << inputYear << endl << endl;
 
+    cout << fixed << setprecision(1);
     for (int month = 1; month <= 12 ; month++)
     {
         float totalSolar = 0.0;
-
+        WeatherRecType record;
+        Date date;
+        float solarRad;
+        int recordMonth;
+        int recordYear;
         for (int i = 0; i < weather_data.Size(); i++)
         {
-            WeatherRecType record = weather_data[i];
-            Date date;
-            float solarRad;
-
+            record = weather_data[i];
             record.GetDate(date);
             record.GetSolarRad(solarRad);
-
-            int recordMonth;
-            int recordYear;
 
             date.GetMonth(recordMonth);
             date.GetYear(recordYear);
