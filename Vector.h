@@ -251,7 +251,7 @@ bool Vector<T>::Insert(int pos, const T & data)
     }
 
     // If Vector is full, resize
-    if (m_size >= m_capacity / 2)
+    if (m_size == m_capacity)
     {
         Resize();
     }
@@ -349,15 +349,33 @@ bool Vector<T>::Exists(const T& item) const
 template <class T>
 void Vector<T>::Resize()
 {
-    int newCapacity = m_capacity * 2;
-    T* newVector = new T[newCapacity];
-    for (int i = 0; i < m_size; i++)
+    int newCapacity;
+    if (m_capacity == 0)
     {
-        newVector[i] = m_vector[i];
+        newCapacity = 2;
+    }
+    else
+    {
+        newCapacity = m_capacity * 2;
+    }
+
+    T* newVector = new T[newCapacity];
+
+    try
+    {
+        for (int i = 0; i < m_size; i++)
+        {
+            newVector[i] = m_vector[i];
+        }
+    }
+    catch(...)
+    {
+        delete[] newVector;
+        throw;
     }
 
     delete[] m_vector;
-    m_vector = newVector;
+    m_vector = newVector;;;
     m_capacity = newCapacity;
 }
 
