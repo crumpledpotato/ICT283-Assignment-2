@@ -116,3 +116,22 @@ bool operator<(const Date& lhs, const Date& rhs)
 
     return lhsDay < rhsDay;
 }
+
+// Compares 2 dates to identify duplicates
+bool operator==(const Date& lhs, const Date& rhs)
+{
+    int lhsDay, lhsMonth, lhsYear;
+    int rhsDay, rhsMonth, rhsYear;
+
+    lhs.GetDay(lhsDay);
+    lhs.GetMonth(lhsMonth);
+    lhs.GetYear(lhsYear);
+
+    rhs.GetDay(rhsDay);
+    rhs.GetMonth(rhsMonth);
+    rhs.GetYear(rhsYear);
+
+    return lhsDay == rhsDay &&
+           lhsMonth == rhsMonth &&
+           lhsYear == rhsYear;
+}
