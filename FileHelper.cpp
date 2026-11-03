@@ -89,7 +89,7 @@ bool FileHelper::FindColumn (string filename, int& wastCol, int& speedCol, int& 
     return true;
 }
 
-bool FileHelper::ReadData (string filename, int wastCol, int speedCol, int TCol, int SRCol, WeatherlogType& weather_data)
+bool FileHelper::ReadData(const string filename, int wastCol, int speedCol, int TCol, int SRCol, WeatherlogType& weather_data)
 {
     ifstream infile(filename);
     if (!infile)
@@ -104,98 +104,15 @@ bool FileHelper::ReadData (string filename, int wastCol, int speedCol, int TCol,
     // Read data row
     while (getline(infile, line))
     {
-        string field;
-        stringstream ss(line);
-        int column = 0;
-        string wast;
-        string speed;
-        string temperature;
-        string solarRad;
+        WeatherRecType record;
 
-        // Split rows
-        while (getline(ss, field, ','))
+        if (!ParseRecord(line, wastCol, speedCol, TCol, SRCol, record))
         {
-            if (column == wastCol)
-            {
-                wast = field;
-            }
-            if (column == speedCol)
-            {
-                speed = field;
-            }
-            if (column == TCol)
-            {
-                temperature = field;
-            }
-            if (column == SRCol)
-            {
-                solarRad = field;
-            }
-            column++;
-        }
-
-        // Validate if speed is a number
-        float windSpeed;
-        float temperatureValue;
-        float solarRadValue;
-
-        try
-        {
-            windSpeed = stof(speed);
-            temperatureValue = stof(temperature);
-            solarRadValue = stof(solarRad);
-        }
-        catch (const invalid_argument& e)
-        {
-            cout << "WAST  : " << wast << endl;
-            cout << " -- Record skipped --" << endl;
-            cout << endl;
+            cout << "Invalid record - skipped" << endl;
             continue;
         }
 
-        // Split WAST into date and time
-        int day;
-        int month;
-        int year;
-        int hour;
-        int minute;
-        // int second;
-        char separator;
-        stringstream wastStream(wast);
-
-        wastStream >> day;
-        wastStream >> separator;
-        wastStream >> month;
-        wastStream >> separator;
-        wastStream >> year;
-        wastStream >> hour;
-        wastStream >> separator;
-        wastStream >> minute;
-
-        Date date (day, month, year);
-        Time time (hour, minute, 0);
-        WeatherRecType record;
-
-        record.SetDate(date);
-        record.SetTime(time);
-        record.SetSpeed(windSpeed);
-        record.SetTemperature(temperatureValue);
-        record.SetSolarRad(solarRadValue);
-
-        if (!weather_data.Exists(record))
-        {
-            weather_data.Insert(weather_data.Size(), record);
-        }
-        else
-        {
-            cout << "Duplicate record skipped" << endl;
-        }
-
-
-        // Enable to print all records to terminal for testing
-        /*cout << "Date  : " << date << endl;
-        cout << "Time  : " << time << endl;
-        cout << "Speed : " << windSpeed << "m/s" << endl << endl;*/
+        weather_data.Insert(weather_data.Size(), record);
     }
     infile.close();
     return true;
@@ -263,5 +180,112 @@ bool FileHelper::WriteData (const WeatherlogType& weather_data)
     }
     outfile.close();
     cout << endl << "WindTempSolar.csv created successfully for year " << inputYear << endl;
+    return true;
+}
+
+bool FileHelper::ParseDateTime(const std::string& wast, Date& date, Time& time)
+{
+    int day;
+    int month;
+    int year;
+    int hour;
+    int minute;
+
+    char separator1;
+    char separator2;
+    char separator3;
+
+    stringstream wastStream(wast);
+    if (!(wastStream >> day >> separator1 >> month >> separator2 >> year
+            >> hour >> separator3 >> minute))
+    {
+        return false;
+    }
+
+    if (separator1 != '/' || separator2 != '/' || separator3 != ':')
+    {
+        return false;
+    }
+
+    if (month < 1 || month > 12 || day < 1 || day > 31 || hour < 0 || hour > 23 ||
+            minute < 0 || minute > 59)
+    {
+        return false;
+    }
+
+    date = Date(day, month, year);
+    time = Time(hour, minute, 0);
+    return true;
+}
+
+bool FileHelper::ParseRecord(const std::string& line, int wastCol, int speedCol, int TCol, int SRCol, WeatherRecType& record)
+{
+    string field;
+    string wast;
+    string speed;
+    string temperature;
+    string solarRad;
+
+    stringstream ss(line);
+    int column = 0;
+
+    while (getline(ss, field, ','))
+    {
+        if (column == wastCol)
+        {
+            wast = field;
+        }
+
+        if (column == speedCol)
+        {
+            speed = field;
+        }
+
+        if (column == TCol)
+        {
+            temperature = field;
+        }
+
+        if (column == SRCol)
+        {
+            solarRad = field;
+        }
+
+        column++;
+    }
+
+    float windSpeed;
+    float temperatureValue;
+    float solarRadValue;
+
+    try
+    {
+        windSpeed = stof(speed);
+        temperatureValue = stof(temperature);
+        solarRadValue = stof(solarRad);
+    }
+    catch (const invalid_argument& e)
+    {
+        return false;
+    }
+    catch (const out_of_range& e)
+    {
+        return false;
+    }
+
+    Date date;
+    Time time;
+
+    if (!ParseDateTime(wast, date, time))
+    {
+        return false;
+    }
+
+    record.SetDate(date);
+    record.SetTime(time);
+    record.SetSpeed(windSpeed);
+    record.SetTemperature(temperatureValue);
+    record.SetSolarRad(solarRadValue);
+
     return true;
 }
