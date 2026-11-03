@@ -161,6 +161,16 @@ private:
      */
     void Resize();
 
+    /**
+     * @brief Creates a deep copy of another Vector's array
+     *
+     * Allocates a new array and copies the stored elements.
+     *
+     * @param other The Vector to copy
+     * @return Pointer to the newly allocated array
+     */
+    T* CopyArray(const Vector<T>& other) const;
+
 };  // End of interface/declaration of the template class
 
 // Default constructor
@@ -211,14 +221,9 @@ Vector<T>::~Vector()
 template <class T>
 Vector<T>::Vector(const Vector<T>& other)
 {
+    m_vector = CopyArray(other);
     m_capacity = other.m_capacity;
     m_size = other.m_size;
-    m_vector = new T[m_capacity];
-
-    for (int i = 0; i < m_size; i++)
-    {
-        m_vector[i] = other.m_vector[i];
-    }
 }
 
 // Assignment operator
@@ -227,15 +232,19 @@ Vector<T>& Vector<T>::operator=(const Vector<T>& other)
 {
     if (this != &other)
     {
-        delete[] m_vector;
-        m_capacity = other.m_capacity;
-        m_size = other.m_size;
-        m_vector = new T[m_capacity];
+        Vector<T> temp(other);
 
-        for (int i = 0; i < m_size; i++)
-        {
-            m_vector[i] = other.m_vector[i];
-        }
+        T* oldVector = m_vector;
+        int oldCapacity = m_capacity;
+        int oldSize = m_size;
+
+        m_vector = temp.m_vector;
+        m_capacity = temp.m_capacity;
+        m_size = temp.m_size;
+
+        temp.m_vector = oldVector;
+        temp.m_capacity = oldCapacity;
+        temp.m_size = oldSize;
     }
     return *this;
 }
@@ -377,6 +386,26 @@ void Vector<T>::Resize()
     delete[] m_vector;
     m_vector = newVector;;;
     m_capacity = newCapacity;
+}
+
+template <class T>
+T* Vector<T>::CopyArray(const Vector<T>& other) const
+{
+    T* newVector = new T[other.m_capacity];
+
+    try
+    {
+        for (int i = 0; i < other.m_size; i++)
+        {
+            newVector[i] = other.m_vector[i];
+        }
+    }
+    catch (...)
+    {
+        delete[] newVector;
+        throw;
+    }
+    return newVector;
 }
 
 #endif
