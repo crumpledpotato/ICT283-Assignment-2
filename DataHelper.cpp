@@ -33,4 +33,17 @@ namespace DataHelper
             weatherMap[year];
         }
     }
+
+    void InsertBalanced(const WeatherlogType& weather_data, BinarySearchTree<WeatherRecType>& tree, int left, int right)
+    {
+        if (left > right)
+        {
+            return;
+        }
+        int mid = left + (right - left) / 2;
+        tree.Insert(weather_data[mid]);
+
+        InsertBalanced(weather_data, tree, left, mid - 1);
+        InsertBalanced(weather_data, tree, mid + 1, right);
+    }
 }
