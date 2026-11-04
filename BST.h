@@ -133,6 +133,13 @@ public:
      */
     bool IsValid() const;
 
+    /**
+     * @brief Returns the number of nodes in the BST.
+     *
+     * @return Total number of nodes.
+     */
+    int Size() const;
+
     // ====== Traversals ======
 
     /**
@@ -212,6 +219,14 @@ private:
      * @return true if the subtree is valid, otherwise false.
      */
     bool IsValid(const nodeType<T>* node, const T* lower, const T* upper) const;
+
+    /**
+     * @brief Recursively counts the nodes in a subtree.
+     *
+     * @param node Root of the subtree.
+     * @return Number of nodes in the subtree.
+     */
+    int CountNodes(const nodeType<T>* node) const;
 
     // ====== Traversals ======
 
@@ -400,6 +415,23 @@ bool BinarySearchTree<T>::IsValid(const nodeType<T>* node, const T* lower, const
 
     return IsValid(node->lLink, lower, &node->info) &&
            IsValid(node->rLink, &node->info, upper);
+}
+
+// ====== Check size of BST ======
+template <class T>
+int BinarySearchTree<T>::Size() const
+{
+    return CountNodes(root);
+}
+
+template <class T>
+int BinarySearchTree<T>::CountNodes(const nodeType<T>* node) const
+{
+    if (node == nullptr)
+    {
+        return 0;
+    }
+    return 1 + CountNodes(node->lLink) + CountNodes(node->rLink);
 }
 
 // ====== In Order Traversals ======
