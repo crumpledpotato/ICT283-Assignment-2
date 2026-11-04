@@ -3,11 +3,14 @@
 
 /**
  * @author  Marcus
- * @version 3.0
- * @date    07/10/2026
+ * @version 4.0
+ * @date    03/11/2026
  */
 
 #include "WeatherRecType.h"
+#include "BST.h"
+
+#include <map>
 
 /**
  * @brief Stores calculated statistics record for a month's data
@@ -33,10 +36,8 @@ struct MonthlyStats
  *
  * MathHelper calculates the averages and sample standard deviation of weather data
  */
-class MathHelper
+namespace MathHelper
 {
-public:
-
     /**
      * @brief Calculates the mean of a set of values
      *
@@ -107,6 +108,39 @@ public:
      * @return True when statistics are successfully calculated, otherwise false
      */
     bool TabulateStatistics(const WeatherlogType& weather_data, int inputYear, MonthlyStats monthlyStats[]);
-};
+
+    /**
+     * @struct SPCCResult
+     * @brief Stores Pearson correlation results for a selected month.
+     *
+     * Contains the three correlation coefficients and status if they are valid
+     * S_T: Wind speed and temperature <br>
+     * S_R: Wind speed and solar radiation <br>
+     * T_R: Temperature and solar radiation <br>
+     *
+     */
+    struct SPCCResult;
+
+    /**
+     * @brief Calculates Pearson correlations for a selected month.
+     *
+     * Traverses all yearly BSTs and accumulates weather measurements within the selected month.
+     *
+     * Calculates the correlations between S_T, S_R, T_R
+     *
+     * @param weatherMap Map containing yearly weather BSTs
+     * @param inputMonth Month selected by the user (1 to 12)
+     * @param result Reference used to store the calculated coefficients
+     * @return true if at least one coefficient is successfully calculated, false if the month is invalid or all coefficients are undefined
+     */
+    bool CalculateSPCC(const map<int, BinarySearchTree<WeatherRecType>>& weatherMap, int inputMonth, SPCCResult& result);
+
+    /**
+     * @brief Displays calculated Pearson correlation coefficients
+     *
+     * @param weatherMap Map containing yearly weather BSTs
+     */
+    void PrintSPCC(const map<int, BinarySearchTree<WeatherRecType>>& weatherMap);
+}
 
 #endif
