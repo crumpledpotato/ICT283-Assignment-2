@@ -32,5 +32,15 @@ namespace DataHelper
      * @param weatherMap Map containing yearly BSTs.
      */
     void BuildWeatherMap( const WeatherlogType& weather_data, std::map<int, BinarySearchTree<WeatherRecType>>& weatherMap);
+
+    /**
+     * @brief Inserts sorted weather records into a BST using midpoint-first insertion.
+     *
+     * @param weather_data Chronologically sorted weather records.
+     * @param tree BST receiving the records.
+     * @param left Starting index of the range.
+     * @param right Ending index of the range.
+     */
+    void InsertBalanced(const WeatherlogType& weather_data, BinarySearchTree<WeatherRecType>& tree, int left, int right);
 }
 #endif

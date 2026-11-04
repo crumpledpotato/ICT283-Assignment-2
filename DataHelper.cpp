@@ -1,5 +1,6 @@
 #include "DataHelper.h"
 #include "SortHelper.h"
+#include "Date.h"
 
 #include <iostream>
 
@@ -23,14 +24,36 @@ namespace DataHelper
     void BuildWeatherMap( const WeatherlogType& weather_data,
                         map<int, BinarySearchTree<WeatherRecType>>& weatherMap)
     {
-        for (int i = 0; i < weather_data.Size(); i++)
-        {
-            Date recordDate;
-            weather_data[i].GetDate(recordDate);
+        int total = weather_data.Size();
 
-            int year;
+        if (total == 0)
+        {
+            return;
+        }
+        int startIndex = 0;
+        Date recordDate;
+        int year;
+        int nextYear;
+
+        while (startIndex < total)
+        {
+            weather_data[startIndex].GetDate(recordDate);
             recordDate.GetYear(year);
-            weatherMap[year];
+            int endIndex = startIndex;
+
+            while (endIndex + 1 < total)
+            {
+                weather_data[endIndex + 1].GetDate(recordDate);
+                recordDate.GetYear(nextYear);
+
+                if (nextYear != year)
+                {
+                    break;
+                }
+                endIndex++;
+            }
+            InsertBalanced(weather_data, weatherMap[year], startIndex, endIndex);
+            startIndex = endIndex + 1;
         }
     }
 
