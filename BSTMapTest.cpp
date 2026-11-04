@@ -1,15 +1,16 @@
-
 #include "Date.h"
 #include "Time.h"
 #include "WeatherRecType.h"
 #include "Vector.h"
 #include "BST.h"
 #include "FileHelper.h"
+#include "DataHelper.h"
 
 #include <iostream>
 #include <string>
 #include <map>
 #include <fstream>
+#include <iomanip>
 
 using namespace std;
 
@@ -38,12 +39,8 @@ void Check(bool condition, const string& testName)
 // Helper: Create weather record
 // ========================================
 
-WeatherRecType MakeRecord(
-    int day, int month, int year,
-    int hour, int minute, int second,
-    float speed = 5.0f,
-    float temperature = 25.0f,
-    float solarRad = 100.0f)
+WeatherRecType MakeRecord(int day, int month, int year, int hour, int minute, int second,
+    float speed = 5.0f, float temperature = 25.0f, float solarRad = 100.0f)
 {
     Date date;
     date.SetDay(day);
@@ -375,10 +372,6 @@ int main()
     TestYearMap();
     TestVector();
 
-    // Enable this after the small tests pass.
-    // It reads the full CSV dataset.
-    // TestCSVYearDistribution();
-
     cout << "\n====================================\n";
     cout << "             TEST SUMMARY\n";
     cout << "====================================\n";
@@ -395,6 +388,80 @@ int main()
         cout << "RESULT: SOME TESTS FAILED\n";
     }
 
+
+    cout << endl << "====================================\n";
+    cout << "       FULL BST CONSTRUCT TEST\n";
+    cout << "====================================\n";
+    WeatherlogType weather_data;
+    map<int, BinarySearchTree<WeatherRecType>> weatherMap;
+
+    // Test insertion of all CSV
+    ifstream infile("data/data_source.txt");
+    if (!infile)
+    {
+        cout << "Unable to open data_source.txt" << endl;
+        return 1;
+    }
+
+    string filename;
+    int wastCol;
+    int speedCol;
+    int TCol;
+    int SRCol;
+
+    while (getline(infile, filename))
+    {
+        if (filename.empty())
+        {
+            continue;
+        }
+        filename = "data/" + filename;
+        cout << endl << "Reading data file : " << filename << endl;
+
+        if (FileHelper::FindColumn(filename, wastCol, speedCol, TCol, SRCol))
+        {
+            if (!FileHelper::ReadData(filename, wastCol, speedCol, TCol, SRCol, weather_data))
+            {
+                cout << "Unable to read " << filename << endl;
+            }
+        }
+        else
+        {
+            cout << "Unable to find required columns in " << filename << endl;
+        }
+    }
+    infile.close();
+
+    DataHelper::PrepareWeatherData(weather_data, weatherMap);
+
+    cout << "\n===== BST Validation =====" << endl;
+
+    int totalBSTRecords = 0;
+
+    map<int, BinarySearchTree<WeatherRecType>>::iterator counter = weatherMap.begin();
+
+    for (int i = 0; i < weatherMap.size(); i++)
+    {
+        int year = counter->first;
+        int count = counter->second.Size();
+        bool valid = counter->second.IsValid();
+
+        cout << "Year : " << year << " | Records : " << right << setw(6) << count << " | BST valid : " << valid << endl;
+
+        totalBSTRecords += count;
+        counter++;
+    }
+    cout << endl << "Total BST records : " << totalBSTRecords << endl;
+    cout << "Total Vector records : " << weather_data.Size() << endl;
+    cout << "Number of years loaded : " << weatherMap.size() << endl;
+    cout << "Number of valid records : " << weather_data.Size() << endl;
+
+    cout << endl << "If TOTAL BST, TOTAL VECTOR and VALID RECORDS match, all valid data is successfully inserted" << endl;
+    cout << "If all BST Valid = 1, each year's BST satisfies the BST Representation Invariant" << endl;
+
+    cout << endl << "====================================\n";
+    cout << "         TESTING CONCLUDED\n";
+    cout << "====================================\n";
     if (testsFailed == 0)
     {
         return 0;
