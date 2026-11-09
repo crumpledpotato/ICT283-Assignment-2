@@ -163,7 +163,7 @@ namespace MathHelper
 
     static int selectedMonth;
     static Vector<float>* selectedWindSpeeds = nullptr;
-
+    static Vector<float>* selectedTemperatures = nullptr;
     /**
      *@brief Collect wind speeds for the selected month
      *@param record Weather recprd visited during BST traversal
@@ -181,6 +181,25 @@ namespace MathHelper
         {
             record.GetSpeed(speed);
             selectedWindSpeeds->Insert(selectedWindSpeeds->Size(), speed);
+        }
+    }
+
+    /**
+     * @brief Collects temperatures from BST records into monthly vectors.
+     * @param record Weather record visited during BST traversal.
+     */
+    void CollectTemperature(const WeatherRecType& record)
+    {
+        Date date;
+        int recordMonth;
+        float temperature;
+
+        record.GetDate(date);
+        date.GetMonth(recordMonth);
+        if (recordMonth >= 1 && recordMonth <= 12)
+        {
+            record.GetTemperature(temperature);
+            selectedTemperatures[recordMonth - 1].Insert(selectedTemperatures[recordMonth - 1].Size(), temperature);
         }
     }
 
@@ -236,12 +255,12 @@ namespace MathHelper
         cout << "==================================================" << endl;
         cout << monthName << " " << inputYear << " : " << endl;
         cout << fixed << setprecision(1);
-        cout << endl << "Average speed      : " << (mean * 3.6) << "km/h" << endl;
-        cout << "Sample stdeviation : " << (stdDeviation * 3.6) << "km/h" << endl << endl;
+        cout << endl << "Average speed             : " << (mean * 3.6) << "km/h" << endl;
+        cout << "Sample standard deviation : " << (stdDeviation * 3.6) << "km/h" << endl << endl;
         return true;
     }
 
-    /*bool CalculateTemperatureStats(const map<int, BinarySearchTree<WeatherRecType>>& weatherMap)
+    bool CalculateTemperatureStats(const map<int, BinarySearchTree<WeatherRecType>>& weatherMap)
     {
         int inputYear;
         cout << endl << "Enter a year to search  : ";
@@ -299,7 +318,7 @@ namespace MathHelper
             }
         }
         return true;
-    }*/
+    }
 
     bool CalculateSolarRad(const WeatherlogType& weather_data)
     {
