@@ -277,27 +277,17 @@ namespace MathHelper
         cout << endl << inputYear << endl << endl;
 
         cout << fixed << setprecision(1);
-
         Vector<float> monthlyTemperatures[12];
-        Date date;
-        float temperature;
-        int recordMonth;
-        int recordYear;
 
-        for (int i =0; i < weather_data.Size(); i++)
+        // Search for BST records for the selected year
+        map<int, BinarySearchTree<WeatherRecType>>::const_iterator counter;
+        counter = weatherMap.find(inputYear);
+
+        if (counter != weatherMap.end())
         {
-            const WeatherRecType& record = weather_data[i];
-
-            record.GetDate(date);
-            record.GetTemperature(temperature);
-            date.GetMonth(recordMonth);
-            date.GetYear(recordYear);
-
-            if (recordYear == inputYear && recordMonth >= 1 && recordMonth <= 12)
-            {
-                monthlyTemperatures[recordMonth-1].Insert(
-                    monthlyTemperatures[recordMonth - 1].Size(), temperature);
-            }
+            selectedTemperatures = monthlyTemperatures;
+            counter->second.InOrder(CollectTemperature);
+            selectedTemperatures = nullptr;
         }
 
         for (int month = 1; month <= 12; month++)
