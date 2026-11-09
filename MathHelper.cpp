@@ -101,7 +101,7 @@ static SPCCData spccData;
  *
  * @param record Reference to the weather record being processed.
  */
-void ProcessSPCCRecord(WeatherRecType& record)
+void ProcessSPCCRecord(const WeatherRecType& record)
 {
     Date date;
     int month;
@@ -161,14 +161,34 @@ namespace MathHelper
     }
 
 
-    bool CalculateWindStats(const WeatherlogType& weather_data)
+    static int selectedMonth;
+    static Vector<float>* selectedWindSpeeds = nullptr;
+
+    /**
+     *@brief Collect wind speeds for the selected month
+     *@param record Weather recprd visited during BST traversal
+     */
+    static void CollectWindSpeed(const WeatherRecType& record)
+    {
+        Date date;
+        int recordMonth;
+        float speed;
+
+        record.GetDate(date);
+        date.GetMonth(recordMonth);
+
+        if (recordMonth == selectedMonth)
+        {
+            record.GetSpeed(speed);
+            selectedWindSpeeds->Insert(selectedWindSpeeds->Size(), speed);
+        }
+    }
+
+    bool CalculateWindStats(const map<int, BinarySearchTree<WeatherRecType>>& weatherMap)
     {
         int inputMonth;
         int inputYear;
         Vector<float> windSpeeds;
-        WeatherRecType record;
-        int recordMonth;
-        int recordYear;
 
         cout << endl << "Enter a month to search : ";
         while (!(cin >> inputMonth) || inputMonth < 1 || inputMonth > 12)
@@ -185,24 +205,20 @@ namespace MathHelper
             cout << endl << "Invalid input, please enter a valid year : ";
         }
 
-        // Search for matching month and year
+        // Search for BST records for the selected year
+        map<int, BinarySearchTree<WeatherRecType>>::const_iterator counter;
+        counter = weatherMap.find(inputYear);
 
-        Date date;
-        float speed;
-        for (int i = 0; i < weather_data.Size(); i++)
+        if (counter == weatherMap.end())
         {
-            record = weather_data[i];
-
-            record.GetDate(date);
-            record.GetSpeed(speed);
-            date.GetMonth(recordMonth);
-            date.GetYear(recordYear);
-
-            if (recordMonth == inputMonth && recordYear == inputYear)
-            {
-                windSpeeds.Insert(windSpeeds.Size(), speed);
-            }
+            cout << endl << "No matching records for " << inputMonth << " / " << inputYear << " found" << endl;
+            return false;
         }
+        selectedMonth = inputMonth;
+        selectedWindSpeeds = &windSpeeds;
+        counter->second.InOrder(CollectWindSpeed);
+        selectedWindSpeeds = nullptr;
+
         if (windSpeeds.Size() == 0)
         {
             cout << endl << "No matching records for " << inputMonth << " / " << inputYear << " found" << endl;
@@ -225,7 +241,7 @@ namespace MathHelper
         return true;
     }
 
-    bool CalculateTemperatureStats(const WeatherlogType& weather_data)
+    /*bool CalculateTemperatureStats(const map<int, BinarySearchTree<WeatherRecType>>& weatherMap)
     {
         int inputYear;
         cout << endl << "Enter a year to search  : ";
@@ -283,7 +299,7 @@ namespace MathHelper
             }
         }
         return true;
-    }
+    }*/
 
     bool CalculateSolarRad(const WeatherlogType& weather_data)
     {

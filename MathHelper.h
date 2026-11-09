@@ -61,10 +61,10 @@ namespace MathHelper
      * Calculates the average wind speed and sample standard deviation for a user-selected month and year <br>
      * The results are then displayed to the terminal
      *
-     * @param weather_data The stored weather records
+     * @param weatherMap Map containing yearly weather BSTs
      * @return True when statistics are successfully calculated, otherwise false
      */
-    bool CalculateWindStats(const WeatherlogType& weather_data);
+    bool CalculateWindStats(const map<int, BinarySearchTree<WeatherRecType>>& weatherMap);
 
     /**
      * @brief Calculates temperature statistics for a selected year
@@ -72,10 +72,10 @@ namespace MathHelper
      * Calculates the average temperature and sample standard deviation sorted by month for the selected year <br>
      * The results are then displayed to the terminal
      *
-     * @param weather_data The stored weather records
+     * @param weatherMap Map containing yearly weather BSTs
      * @return True when statistics are successfully calculated, otherwise false
      */
-    bool CalculateTemperatureStats(const WeatherlogType& weather_data);
+    //bool CalculateTemperatureStats(const map<int, BinarySearchTree<WeatherRecType>>& weatherMap);
 
     /**
      * @brief Calculates total solar radiation each month for a selected year
