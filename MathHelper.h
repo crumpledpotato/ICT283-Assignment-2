@@ -75,7 +75,7 @@ namespace MathHelper
      * @param weatherMap Map containing yearly weather BSTs
      * @return True when statistics are successfully calculated, otherwise false
      */
-    //bool CalculateTemperatureStats(const map<int, BinarySearchTree<WeatherRecType>>& weatherMap);
+    bool CalculateTemperatureStats(const map<int, BinarySearchTree<WeatherRecType>>& weatherMap);
 
     /**
      * @brief Calculates total solar radiation each month for a selected year
