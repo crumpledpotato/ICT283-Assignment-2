@@ -203,6 +203,47 @@ namespace MathHelper
         }
     }
 
+    static Vector<float>* selectedMonthlyWindSpeeds = nullptr;
+    static Vector<float>* selectedMonthlyTemperatures = nullptr;
+    static Vector<float>* selectedMonthlySolarRadiation = nullptr;
+
+    /**
+     * @brief Collects monthly weather measurements during BST traversal.
+     * @param record Weather record visited during traversal.
+     */
+    static void CollectMonthlyStats(const WeatherRecType& record)
+    {
+        Date date;
+        int recordMonth;
+        float speed;
+        float temperature;
+        float solarRad;
+
+        record.GetDate(date);
+        date.GetMonth(recordMonth);
+
+        if (recordMonth < 1 || recordMonth > 12)
+        {
+            return;
+        }
+
+        record.GetSpeed(speed);
+        record.GetTemperature(temperature);
+        record.GetSolarRad(solarRad);
+
+        int index = recordMonth - 1;
+
+        selectedMonthlyWindSpeeds[index].Insert(selectedMonthlyWindSpeeds[index].Size(), speed);
+
+        selectedMonthlyTemperatures[index].Insert(selectedMonthlyTemperatures[index].Size(), temperature);
+
+        if (solarRad >= 100)
+        {
+            selectedMonthlySolarRadiation[index].Insert(selectedMonthlySolarRadiation[index].Size(), solarRad);
+        }
+    }
+
+
     bool CalculateWindStats(const map<int, BinarySearchTree<WeatherRecType>>& weatherMap)
     {
         int inputMonth;
@@ -369,7 +410,7 @@ namespace MathHelper
          return true;
     }
 
-    bool TabulateStatistics(const WeatherlogType& weather_data, int inputYear, MonthlyStats monthlyStats[])
+    bool TabulateStatistics(const map<int, BinarySearchTree<WeatherRecType>>& weatherMap, int inputYear, MonthlyStats monthlyStats[])
     {
         for (int month = 1; month <= 12; month++)
         {
@@ -377,7 +418,7 @@ namespace MathHelper
             Vector<float> temperatures;
             Vector<float> solarRadiation;
 
-            for (int i = 0; i < weather_data.Size(); i++)
+            for (int i = 0; i < weatherMap.Size(); i++)
             {
                 WeatherRecType record = weather_data[i];
 
@@ -414,15 +455,18 @@ namespace MathHelper
             {
                 float mean = CalculateMean(windSpeeds);
                 float stdDeviation = CalculateStdDeviation(windSpeeds, mean);
+                float mad = CalculateMAD(windSpeeds, mean);
 
                 monthlyStats[month - 1].avgWindSpeed = mean * 3.6;
                 monthlyStats[month - 1].windStdDeviation = stdDeviation * 3.6;
+                monthlyStats[month - 1].windMAD = mad * 3.6;
                 monthlyStats[month - 1].hasWindData = true;
             }
             else
             {
                 monthlyStats[month - 1].avgWindSpeed = 0.0;
                 monthlyStats[month - 1].windStdDeviation = 0.0;
+                monthlyStats[month - 1].windMAD = 0.0;
                 monthlyStats[month - 1].hasWindData = false;
             }
 
@@ -431,15 +475,18 @@ namespace MathHelper
             {
                 float mean = CalculateMean(temperatures);
                 float stdDeviation = CalculateStdDeviation(temperatures, mean);
+                float mad = CalculateMAD(temperatures, mean);
 
                 monthlyStats[month - 1].avgTemperature = mean;
                 monthlyStats[month - 1].temperatureStdDeviation = stdDeviation;
+                monthlyStats[month - 1].temperatureMAD = mad;
                 monthlyStats[month - 1].hasTemperatureData = true;
             }
             else
             {
                 monthlyStats[month - 1].avgTemperature = 0.0;
                 monthlyStats[month - 1].temperatureStdDeviation = 0.0;
+                monthlyStats[month - 1].temperatureMAD = 0.0;
                 monthlyStats[month - 1].hasTemperatureData = false;
             }
 
