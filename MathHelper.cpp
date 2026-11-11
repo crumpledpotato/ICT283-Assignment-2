@@ -465,6 +465,20 @@ namespace MathHelper
         return true;
     }
 
+    float CalculateMAD(const Vector<float>& values, float mean)
+    {
+        if (values.Size() == 0)
+        {
+            return 0.0;
+        }
+        float totalDeviation = 0.0;
+        for (int i = 0; i < values.Size(); i++)
+        {
+            totalDeviation += fabs(values[i] - mean);
+        }
+        return totalDeviation / values.Size();
+    }
+
     struct SPCCResult
     {
         double ST = 0.0;
