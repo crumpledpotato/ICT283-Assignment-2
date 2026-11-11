@@ -11,23 +11,6 @@ using namespace std;
 
 namespace FileHelper
 {
-    bool SelectFile (string& filename, int& wastCol, int& speedCol, int& TCol, int& SRCol)
-    {
-        cout << "Reading data_source.txt" << endl << ".\n.\n.\n" << endl;
-        ifstream infile("data/data_source.txt");
-        if (!infile)
-        {
-            cout << endl << ("Unable to open data_source.txt") << endl;
-            return false;
-        }
-        getline(infile, filename);
-        infile.close();
-
-        filename = "data/" + filename;
-        cout << "Data file : " << filename << endl;
-        return FindColumn(filename, wastCol, speedCol, TCol, SRCol);
-    }
-
     bool FindColumn (const string& filename, int& wastCol, int& speedCol, int& TCol, int& SRCol)
     {
         // Open CSV file
