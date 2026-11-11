@@ -15,7 +15,7 @@ using namespace std;
 // Named constants for menu options
 const int WIND_STATS = 1;
 const int TEMPERATURE_STATS = 2;
-const int SOLAR_STATS = 3;
+const int SPCC_STATS = 3;
 const int EXPORT_STATS = 4;
 const int EXIT_PROGRAM = 5;
 
@@ -33,56 +33,61 @@ int Menu();
  *
  * @param weather_data The stored weather records
  */
-void ProcessMenu(const WeatherlogType& weather_data);
+void ProcessMenu(const map<int, BinarySearchTree<WeatherRecType>>& weatherMap);
 
 int main()
 {
-    WeatherlogType weather_data;
+
     map<int, BinarySearchTree<WeatherRecType>> weatherMap;
-
-    ifstream infile("data/data_source.txt");
-    if (!infile)
+    int validRecords = 0;
     {
-        cout << "Unable to open data_source.txt" << endl;
-        return 1;
-    }
-
-    string filename;
-    int wastCol;
-    int speedCol;
-    int TCol;
-    int SRCol;
-
-    while (getline(infile, filename))
-    {
-        if (filename.empty())
+        WeatherlogType weather_data;
+        ifstream infile("data/data_source.txt");
+        if (!infile)
         {
-            continue;
+            cout << "Unable to open data_source.txt" << endl;
+            return 1;
         }
-        filename = "data/" + filename;
-        cout << endl << "Reading data file : " << filename << endl;
 
-        if (FileHelper::FindColumn(filename, wastCol, speedCol, TCol, SRCol))
+        string filename;
+        int wastCol;
+        int speedCol;
+        int TCol;
+        int SRCol;
+
+        while (getline(infile, filename))
         {
-            if (!FileHelper::ReadData(filename, wastCol, speedCol, TCol, SRCol, weather_data))
+            if (filename.empty())
             {
-                cout << "Unable to read " << filename << endl;
+                continue;
             }
+            filename = "data/" + filename;
+            cout << endl << "Reading data file : " << filename << endl;
+
+            if (FileHelper::FindColumn(filename, wastCol, speedCol, TCol, SRCol))
+            {
+                if (!FileHelper::ReadData(filename, wastCol, speedCol, TCol, SRCol, weather_data))
+                {
+                    cout << "Unable to read " << filename << endl;
+                }
+            }
+            else
+            {
+                cout << "Unable to find required columns in " << filename << endl;
+            }
+
         }
-        else
-        {
-            cout << "Unable to find required columns in " << filename << endl;
-        }
+        infile.close();
+        DataHelper::PrepareWeatherData(weather_data, weatherMap);
+        validRecords = weather_data.Size();
     }
-    infile.close();
 
-    DataHelper::PrepareWeatherData(weather_data, weatherMap);
     cout << endl << "Number of years loaded : " << weatherMap.size() << endl;
-    cout << endl << "Number of valid records : " << weather_data.Size() << endl;
+    cout << endl << "Number of valid records : " << validRecords << endl;
 
-    if (weather_data.Size() > 0)
+    if (!weatherMap.empty())
     {
-        ProcessMenu(weather_data);
+        ProcessMenu(weatherMap);
     }
     else
     {
@@ -99,7 +104,7 @@ int Menu()
     cout << endl << "=============== Wind Data Analysis ===============" << endl;
     cout << "1. Average wind speed and standard deviation" << endl;
     cout << "2. Average ambient temperature and standard deviation" << endl;
-    cout << "3. Total solar radiation" << endl;
+    cout << "3. Sample Pearson Correlation Coefficient statistics" << endl;
     cout << "4. Export wind, temperature and solar statistics" << endl;
     cout << "5. Exit" << endl;
     cout << "==================================================" << endl << endl;
@@ -114,7 +119,7 @@ int Menu()
     return option;
 }
 
-void ProcessMenu(const WeatherlogType& weather_data)
+void ProcessMenu(const map<int, BinarySearchTree<WeatherRecType>>& weatherMap)
 {
     int option;
 
@@ -124,13 +129,14 @@ void ProcessMenu(const WeatherlogType& weather_data)
         switch (option)
         {
         case WIND_STATS:
-            MathHelper::CalculateWindStats(weather_data); break;
+            MathHelper::CalculateWindStats(weatherMap); break;
         case TEMPERATURE_STATS:
-            MathHelper::CalculateTemperatureStats(weather_data); break;
-        case SOLAR_STATS:
-            MathHelper::CalculateSolarRad(weather_data); break;
+            MathHelper::CalculateTemperatureStats(weatherMap); break;
+        case SPCC_STATS:
+            MathHelper::PrintSPCC(weatherMap); break;
         case EXPORT_STATS:
-            FileHelper::WriteData(weather_data); break;
+            //FileHelper::WriteData(weather_data);
+            break;
         case EXIT_PROGRAM:
             cout << endl << "===== Exiting the programme =====" << endl; break;
         default:
