@@ -412,43 +412,33 @@ namespace MathHelper
 
     bool TabulateStatistics(const map<int, BinarySearchTree<WeatherRecType>>& weatherMap, int inputYear, MonthlyStats monthlyStats[])
     {
+        Vector<float> monthlyWindSpeeds[12];
+        Vector<float> monthlyTemperatures[12];
+        Vector<float> monthlySolarRadiation[12];
+
+        // Find the BST containing the selected year
+        map<int, BinarySearchTree<WeatherRecType>>::const_iterator counter;
+        counter = weatherMap.find(inputYear);
+
+        if (counter != weatherMap.end())
+        {
+            selectedMonthlyWindSpeeds = monthlyWindSpeeds;
+            selectedMonthlyTemperatures = monthlyTemperatures;
+            selectedMonthlySolarRadiation = monthlySolarRadiation;
+
+            counter->second.InOrder(CollectMonthlyStats);
+
+            selectedMonthlyWindSpeeds = nullptr;
+            selectedMonthlyTemperatures = nullptr;
+            selectedMonthlySolarRadiation = nullptr;
+        }
+
         for (int month = 1; month <= 12; month++)
         {
-            Vector<float> windSpeeds;
-            Vector<float> temperatures;
-            Vector<float> solarRadiation;
-
-            for (int i = 0; i < weatherMap.Size(); i++)
-            {
-                WeatherRecType record = weather_data[i];
-
-                Date date;
-                float speed;
-                float temperature;
-                float solarRad;
-
-                int recordMonth;
-                int recordYear;
-
-                record.GetDate(date);
-                record.GetSpeed(speed);
-                record.GetTemperature(temperature);
-                record.GetSolarRad(solarRad);
-
-                date.GetMonth(recordMonth);
-                date.GetYear(recordYear);
-
-                if (recordMonth == month && recordYear == inputYear)
-                {
-                    windSpeeds.Insert(windSpeeds.Size(), speed);
-                    temperatures.Insert(temperatures.Size(), temperature);
-
-                    if (solarRad >= 100)
-                    {
-                        solarRadiation.Insert(solarRadiation.Size(), solarRad);
-                    }
-                }
-            }
+            int index = month - 1;
+            Vector<float>& windSpeeds = monthlyWindSpeeds[index];
+            Vector<float>& temperatures = monthlyTemperatures[index];
+            Vector<float>& solarRadiation = monthlySolarRadiation[index];
 
             // Calculate wind values
             if (windSpeeds.Size() > 0)
@@ -457,17 +447,17 @@ namespace MathHelper
                 float stdDeviation = CalculateStdDeviation(windSpeeds, mean);
                 float mad = CalculateMAD(windSpeeds, mean);
 
-                monthlyStats[month - 1].avgWindSpeed = mean * 3.6;
-                monthlyStats[month - 1].windStdDeviation = stdDeviation * 3.6;
-                monthlyStats[month - 1].windMAD = mad * 3.6;
-                monthlyStats[month - 1].hasWindData = true;
+                monthlyStats[index].avgWindSpeed = mean * 3.6;
+                monthlyStats[index].windStdDeviation = stdDeviation * 3.6;
+                monthlyStats[index].windMAD = mad * 3.6;
+                monthlyStats[index].hasWindData = true;
             }
             else
             {
-                monthlyStats[month - 1].avgWindSpeed = 0.0;
-                monthlyStats[month - 1].windStdDeviation = 0.0;
-                monthlyStats[month - 1].windMAD = 0.0;
-                monthlyStats[month - 1].hasWindData = false;
+                monthlyStats[index].avgWindSpeed = 0.0;
+                monthlyStats[index].windStdDeviation = 0.0;
+                monthlyStats[index].windMAD = 0.0;
+                monthlyStats[index].hasWindData = false;
             }
 
             // Calculate temperature values
@@ -477,17 +467,17 @@ namespace MathHelper
                 float stdDeviation = CalculateStdDeviation(temperatures, mean);
                 float mad = CalculateMAD(temperatures, mean);
 
-                monthlyStats[month - 1].avgTemperature = mean;
-                monthlyStats[month - 1].temperatureStdDeviation = stdDeviation;
-                monthlyStats[month - 1].temperatureMAD = mad;
-                monthlyStats[month - 1].hasTemperatureData = true;
+                monthlyStats[index].avgTemperature = mean;
+                monthlyStats[index].temperatureStdDeviation = stdDeviation;
+                monthlyStats[index].temperatureMAD = mad;
+                monthlyStats[index].hasTemperatureData = true;
             }
             else
             {
-                monthlyStats[month - 1].avgTemperature = 0.0;
-                monthlyStats[month - 1].temperatureStdDeviation = 0.0;
-                monthlyStats[month - 1].temperatureMAD = 0.0;
-                monthlyStats[month - 1].hasTemperatureData = false;
+                monthlyStats[index].avgTemperature = 0.0;
+                monthlyStats[index].temperatureStdDeviation = 0.0;
+                monthlyStats[index].temperatureMAD = 0.0;
+                monthlyStats[index].hasTemperatureData = false;
             }
 
             // Calculate solar radiation values
@@ -499,16 +489,20 @@ namespace MathHelper
                 {
                     sumSolarRad += solarRadiation[i] / 6000;
                 }
-                monthlyStats[month - 1].totalSolarRad = sumSolarRad;
-                monthlyStats[month - 1].hasSolarData = true;
+
+                monthlyStats[index].totalSolarRad = sumSolarRad;
+                monthlyStats[index].hasSolarData = true;
             }
             else
             {
-                monthlyStats[month - 1].totalSolarRad = 0.0;
-                monthlyStats[month - 1].hasSolarData = false;
+                monthlyStats[index].totalSolarRad = 0.0;
+                monthlyStats[index].hasSolarData = false;
             }
-            monthlyStats[month - 1].hasAnyData = monthlyStats[month - 1].hasWindData || monthlyStats[month - 1].hasTemperatureData || monthlyStats[month - 1].hasSolarData;
+
+            monthlyStats[index].hasAnyData = monthlyStats[index].hasWindData ||
+                monthlyStats[index].hasTemperatureData || monthlyStats[index].hasSolarData;
         }
+
         return true;
     }
 
