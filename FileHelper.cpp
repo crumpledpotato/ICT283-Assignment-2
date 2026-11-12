@@ -100,12 +100,6 @@ namespace FileHelper
                 skippedCount++;
                 continue;
             }
-
-            /*if (RecordExists(weather_data, record))
-            {
-                cout << endl << "Duplicate record found - skipped" << endl;
-                continue;
-            }*/
             weather_data.Insert(weather_data.Size(), record);
             loadedCount++;
         }
@@ -293,17 +287,5 @@ namespace FileHelper
         record.SetSolarRad(solarRadValue);
 
         return true;
-    }
-
-    bool RecordExists(const WeatherlogType& weather_data, const WeatherRecType& record)
-    {
-        for (int i = 0; i < weather_data.Size(); i++)
-        {
-            if (weather_data[i] == record)
-            {
-                return true;
-            }
-        }
-        return false;
     }
 }
