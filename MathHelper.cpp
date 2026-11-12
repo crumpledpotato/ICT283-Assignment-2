@@ -351,65 +351,6 @@ namespace MathHelper
         return true;
     }
 
-    bool CalculateSolarRad(const WeatherlogType& weather_data)
-    {
-        int inputYear;
-        cout << endl << "Enter a year to search  : ";
-        while (!(cin >> inputYear) || inputYear < 1)
-        {
-            cin.clear();
-            cin.ignore(1000, '\n');
-            cout << endl << "Invalid input, please enter a valid year : ";
-        }
-
-        cout << endl << "==================================================" << endl;
-        cout << "            SOLAR RADIATION STATISTICS" << endl;
-        cout << "==================================================" << endl;
-        cout << endl << inputYear << endl << endl;
-
-        cout << fixed << setprecision(1);
-        for (int month = 1; month <= 12 ; month++)
-        {
-            float totalSolar = 0.0;
-            WeatherRecType record;
-            Date date;
-            float solarRad;
-            int recordMonth;
-            int recordYear;
-            for (int i = 0; i < weather_data.Size(); i++)
-            {
-                record = weather_data[i];
-                record.GetDate(date);
-                record.GetSolarRad(solarRad);
-
-                date.GetMonth(recordMonth);
-                date.GetYear(recordYear);
-
-                if (recordMonth == month && recordYear == inputYear)
-                {
-                    // Condition stated in Assignment brief
-                    if (solarRad >= 100)
-                    {
-                        totalSolar += solarRad / 6000;
-                    }
-                }
-            }
-            Date selectedDate (1, month, inputYear);
-            string monthName;
-            selectedDate.GetMonthName(monthName);
-
-            if (totalSolar > 0)
-            {
-                cout << left << setw(10) << monthName << " : "<< totalSolar << " kWh/m2" << endl;
-            }
-            else
-            {
-                cout << left << setw(10) << monthName << " : No Data" << endl;
-            }
-        }
-         return true;
-    }
-
     bool TabulateStatistics(const map<int, BinarySearchTree<WeatherRecType>>& weatherMap, int inputYear, MonthlyStats monthlyStats[])
     {
         Vector<float> monthlyWindSpeeds[12];
