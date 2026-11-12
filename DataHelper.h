@@ -7,6 +7,14 @@
 
 #include <map>
 
+/**
+ * @brief Handles data input, output, and data-related operations
+ *
+ * DataHelper is responsible for data handling processes, such as: <br>
+ * - Cleaning duplicates from the initial data store prior to insertion <br>
+ * - Establishing the Map-BST structure <br>
+ * - Handling median-quartile insertion functionality
+ */
 namespace DataHelper
 {
     /**

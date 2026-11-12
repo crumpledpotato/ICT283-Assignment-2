@@ -26,18 +26,18 @@ struct nodeType
     T info;
     nodeType<T>* lLink;
     nodeType<T>* rLink;
-
-    /**
-     * @brief Constructs a node.
-     * @param value Value to store in the node.
-     */
-    nodeType(const T& value)
-    {
-        info = value;
-        lLink = nullptr;
-        rLink = nullptr;
-    }
 };
+
+/**
+ * @brief Constructs a node.
+ * @param value Value to store in the node.
+ */
+nodeType(const T& value)
+{
+    info = value;
+    lLink = nullptr;
+    rLink = nullptr;
+}
 
 /**
  * @class BinarySearchTree
@@ -61,7 +61,7 @@ public:
      *
      * @param T& Reference to the value stored in the current node.
      */
-    typedef void (*f1Typ)(T&);
+    typedef void (*f1Typ)(const T&);
 
     /**
      * @brief Default constructor.

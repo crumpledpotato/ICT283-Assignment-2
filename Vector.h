@@ -4,7 +4,7 @@
 /**
  * @author  Marcus
  * @version 3.0
- * @date 3/11/2026
+ * @date 03/11/2026
  */
 
 #include <stdexcept>
@@ -31,9 +31,11 @@ public:
     /**
      * @brief Parameterised constructor
      *
-     * Creates an empty Vector with a specified initial capacity
+     * Creates an empty Vector with a specified n-value initial capacity <br>
+     * The capacity must be greater than initial size
      *
-     * @param n The initial capacity of the Vector
+     * @param n The initial number of eleements in the Vector
+     * @throws std::invalid_argument If n is negative
      */
     Vector(int n);
 
@@ -169,16 +171,9 @@ private:
 template <class T>
 Vector<T>::Vector()
 {
-    m_vector = new T[100];
     m_size = 0;
-    if (m_vector != nullptr)
-    {
-        m_capacity = 100;
-    }
-    else
-    {
-        m_capacity = 0;
-    }
+    m_capacity = 100;
+    m_vector = new T[m_capacity];
 }
 
 // Parameterised constructor

@@ -32,10 +32,53 @@
 			<Add option="-Wall" />
 		</Compiler>
 		<Unit filename="BST.h" />
+		<Unit filename="BSTMapTest.cpp">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="BSTTest.cpp">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="DataHelper.cpp" />
+		<Unit filename="DataHelper.h">
+			<Option target="&lt;{~None~}&gt;" />
+		</Unit>
 		<Unit filename="Date.cpp" />
 		<Unit filename="Date.h" />
 		<Unit filename="DateIO.cpp" />
 		<Unit filename="DateIO.h" />
+		<Unit filename="FileHelper.cpp" />
+		<Unit filename="FileHelper.h" />
+		<Unit filename="MathHelper.cpp" />
+		<Unit filename="MathHelper.h" />
+		<Unit filename="MathHelperTest.cpp">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="SortHelper.cpp" />
+		<Unit filename="SortHelper.h">
+			<Option target="&lt;{~None~}&gt;" />
+		</Unit>
+		<Unit filename="SortHelperTest.cpp">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="Time.cpp" />
+		<Unit filename="Time.h" />
+		<Unit filename="TimeIO.cpp" />
+		<Unit filename="TimeIO.h" />
+		<Unit filename="Vector.h" />
+		<Unit filename="VectorTest.cpp">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="WeatherRecType.cpp" />
+		<Unit filename="WeatherRecType.h" />
+		<Unit filename="WeatherlogTypeTest.cpp">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
 		<Unit filename="main.cpp" />
 		<Extensions />
 	</Project>

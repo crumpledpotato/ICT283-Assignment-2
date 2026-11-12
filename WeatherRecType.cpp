@@ -111,20 +111,41 @@ bool WeatherRecType::operator<(const WeatherRecType& other) const
     GetTime(time1);
     other.GetTime(time2);
 
-    if (date1.GetYear() != date2.GetYear())
-        return date1.GetYear() < date2.GetYear();
+    int day1, month1, year1;
+    int day2, month2, year2;
+    int hour1, minute1, second1;
+    int hour2, minute2, second2;
 
-    if (date1.GetMonth() != date2.GetMonth())
-        return date1.GetMonth() < date2.GetMonth();
+    date1.GetDay(day1);
+    date1.GetMonth(month1);
+    date1.GetYear(year1);
 
-    if (date1.GetDay() != date2.GetDay())
-        return date1.GetDay() < date2.GetDay();
+    date2.GetDay(day2);
+    date2.GetMonth(month2);
+    date2.GetYear(year2);
 
-    if (time1.GetHour() != time2.GetHour())
-        return time1.GetHour() < time2.GetHour();
+    time1.GetHour(hour1);
+    time1.GetMinute(minute1);
+    time1.GetSecond(second1);
 
-    if (time1.GetMinute() != time2.GetMinute())
-        return time1.GetMinute() < time2.GetMinute();
+    time2.GetHour(hour2);
+    time2.GetMinute(minute2);
+    time2.GetSecond(second2);
 
-    return time1.GetSecond() < time2.GetSecond();
+    if (year1 != year2)
+        return year1 < year2;
+
+    if (month1 != month2)
+        return month1 < month2;
+
+    if (day1 != day2)
+        return day1 < day2;
+
+    if (hour1 != hour2)
+        return hour1 < hour2;
+
+    if (minute1 != minute2)
+        return minute1 < minute2;
+
+    return second1 < second2;
 }

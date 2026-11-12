@@ -92,4 +92,12 @@ private:
  */
 bool operator<(const Date& lhs, const Date& rhs);
 
+/**
+ * @brief Compares two dates to identify duplicates.
+ * @param lhs The first date.
+ * @param rhs The second date.
+ * @return true if lhs and rhs are the same.
+ */
+bool operator==(const Date& lhs, const Date& rhs);
+
 #endif

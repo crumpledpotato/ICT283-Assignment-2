@@ -15,6 +15,11 @@ namespace SortHelper
                 temp[k] = data[j];
                 j++;
             }
+            else
+            {
+                temp[k] = data[i];
+                i++;
+            }
             k++;
         }
 
@@ -66,4 +71,33 @@ namespace SortHelper
         }
         MergeSort(data, temp, 0, data.Size() - 1);
     }
+
+     int RemoveDuplicates(WeatherlogType& data)
+     {
+         if (data.Size() < 2)
+         {
+             return 0;
+         }
+         WeatherlogType uniqueData;
+         uniqueData.Insert(uniqueData.Size(), data[0]);
+         int duplicates = 0;
+
+         for (int i = 1; i < data.Size(); i++)
+         {
+             const WeatherRecType& current = data[i];
+             const WeatherRecType& previous = uniqueData[uniqueData.Size() - 1];
+
+             // Compare using Date and Time
+             if (!(current < previous) && ! (previous < current))
+             {
+                 duplicates++;
+             }
+             else
+             {
+                 uniqueData.Insert(uniqueData.Size(), current);
+             }
+         }
+         data = uniqueData;
+         return duplicates;
+     }
 }

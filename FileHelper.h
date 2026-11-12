@@ -4,44 +4,29 @@
 /**
  * @author  Marcus
  * @version 4.0
- * @date    03/11/2026
+ * @date    13/11/2026
  */
 
 #include "Date.h"
 #include "Time.h"
 #include "Vector.h"
 #include "WeatherRecType.h"
+#include "BST.h"
 
 #include <string>
+#include <map>
 
 /**
  * @brief Handles file input, output, and file-related operations
  *
  * FileHelper is responsible for file handling processes, such as: <br>
- * - Selecting a file to read from a list of options <br>
- * - Reading the data and finding WAST and S columns <br>
+ * - Reading the data and finding WAST, S, T & SR columns <br>
+ * - Parsing to organise necessary data fields <br>
  * - Displaying calculated statistics to the terminal <br>
  * - Writing output to file testoutput.csv
  */
 namespace FileHelper
 {
-public:
-
-    /**
-     * @brief Allows the user to select an input CSV file
-     *
-     * Displays the available files and prompts user to input a validated choice <br>
-     * Calls function FindColumn() to locate WAST, S, T, SR columns and displays the results
-     *
-     * @param filename Variable used to store the selected filename
-     * @param wastCol Variable used to store the WAST column number
-     * @param speedCol Variable used to store the S column number
-     * @param TCol Variable used to store the T column number
-     * @param SRCol Variable used to store the SR column number
-     * @return true if a valid file and required columns are found, otherwise false
-     */
-    bool SelectFile (std::string& filename, int& wastCol, int& speedCol, int& TCol, int& SRCol);
-
     /**
      * @brief Finds the WAST and S columns in the CSV file
      *
@@ -54,10 +39,10 @@ public:
      * @param SRCol Variable used to store the SR column number
      * @return true if both columns are found, otherwise false
      */
-    bool FindColumn (const std::string filename, int& wastCol, int& speedCol, int& TCol, int& SRCol);
+    bool FindColumn (const std::string& filename, int& wastCol, int& speedCol, int& TCol, int& SRCol);
 
      /**
-     * @brief Reads wind data from a CSV file and stores data into WindRecType
+     * @brief Reads weather data from a CSV file and stores data into WeatherLogType
      *
      * Reads the WAST date and time, S wind speed, T temperature and SR solar radiation from the selected columns <br>
      * Valid records are stored in weather_data <br>
@@ -65,30 +50,14 @@ public:
      * If records match an existing stored record, record is also skipped
      *
      * @param filename Name of the CSV input file
-     * @param wastCol Column number containing WAST data
-     * @param speedCol Column number containing wind speed data
-     * @param TCol Column number containing temperature data
-     * @param SRCol Column number containing solar radiation data
+     * @param wastCol Column index containing WAST data
+     * @param speedCol Column index containing wind speed data
+     * @param TCol Column index containing temperature data
+     * @param SRCol Column index containing solar radiation data
      * @param weather_data The stored weather records
      * @return true if the file is successfully opened and read, otherwise false
      */
-    bool ReadData (const std::string filename, int wastCol, int speedCol, int TCol, int SRCol, WeatherlogType& weather_data);
-
-    /**
-     * @brief Displays the main program menu and gets the user's selection.
-     *
-     * @return The selected menu option.
-     */
-    int Menu();
-
-    /**
-     * @brief Displays the menu and processes the user's selection.
-     *
-     * Loops the menu until the user selects the exit option.
-     *
-     * @param weather_data The stored weather records.
-     */
-     void ProcessMenu(WeatherlogType& weather_data);
+    bool ReadData (const std::string& filename, int wastCol, int speedCol, int TCol, int SRCol, WeatherlogType& weather_data);
 
     /**
      * @brief Writes weather data to a .csv file
@@ -97,9 +66,42 @@ public:
      * Prompts user to input a year <br>
      * Writes the monthly statistics to WindTempSolar.csv
      *
-     * @param weather_data The stored weather records
+     * @param weatherMap Map containing yearly weather BSTs
      * @return true if the file is successfully written, otherwise false
      */
-    bool WriteData (const WeatherlogType& weather_data);
-};
+    bool WriteData (const map<int, BinarySearchTree<WeatherRecType>>& weatherMap);
+
+    /**
+     * @brief Parses WAST data into Date and Time objects
+     *
+     * Extracts the day, month, year, hour and minute from a WAST string. <br>
+     * Validates the date and time format and checks that values are within the accepted ranges. <br>
+     * Stores the parsed values in the provided Date and Time objects.
+     *
+     * @param wast String containing the WAST date and time
+     * @param date Date object used to store the parsed date
+     * @param time Time object used to store the parsed time
+     * @return true if the date and time are successfully parsed, otherwise false
+     */
+    bool ParseDateTime(const std::string& wast, Date& date, Time& time);
+
+    /**
+     * @brief Parses a CSV row into a WeatherRecType record
+     *
+     * Extracts WAST, wind speed, temperature and solar radiation values
+     * from their corresponding CSV columns. <br>
+     * Converts numeric strings into float values and validates the data. <br>
+     * Calls ParseDateTime() to extract the date and time. <br>
+     * Stores the parsed values in the provided WeatherRecType object.
+     *
+     * @param line String containing one CSV data row
+     * @param wastCol Column index containing WAST data
+     * @param speedCol Column index containing wind speed data
+     * @param TCol Column index containing temperature data
+     * @param SRCol Column index containing solar radiation data
+     * @param record WeatherRecType object used to store the parsed record
+     * @return true if the record is successfully parsed, otherwise false
+     */
+    bool ParseRecord(const std::string& line, int wastCol, int speedCol, int TCol, int SRCol, WeatherRecType& record);
+}
 #endif

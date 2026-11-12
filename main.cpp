@@ -37,7 +37,6 @@ void ProcessMenu(const map<int, BinarySearchTree<WeatherRecType>>& weatherMap);
 
 int main()
 {
-
     map<int, BinarySearchTree<WeatherRecType>> weatherMap;
     int validRecords = 0;
     {
@@ -105,7 +104,7 @@ int Menu()
     cout << "1. Average wind speed and standard deviation" << endl;
     cout << "2. Average ambient temperature and standard deviation" << endl;
     cout << "3. Sample Pearson Correlation Coefficient statistics" << endl;
-    cout << "4. Export wind, temperature and solar statistics" << endl;
+    cout << "4. Export weather standard deviation & Mean Absolute Deviation" << endl;
     cout << "5. Exit" << endl;
     cout << "==================================================" << endl << endl;
     cout << "Enter your option : ";
@@ -135,8 +134,7 @@ void ProcessMenu(const map<int, BinarySearchTree<WeatherRecType>>& weatherMap)
         case SPCC_STATS:
             MathHelper::PrintSPCC(weatherMap); break;
         case EXPORT_STATS:
-            //FileHelper::WriteData(weather_data);
-            break;
+            FileHelper::WriteData(weatherMap); break;
         case EXIT_PROGRAM:
             cout << endl << "===== Exiting the programme =====" << endl; break;
         default:

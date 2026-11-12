@@ -243,7 +243,6 @@ namespace MathHelper
         }
     }
 
-
     bool CalculateWindStats(const map<int, BinarySearchTree<WeatherRecType>>& weatherMap)
     {
         int inputMonth;
@@ -443,7 +442,6 @@ namespace MathHelper
             monthlyStats[index].hasAnyData = monthlyStats[index].hasWindData ||
                 monthlyStats[index].hasTemperatureData || monthlyStats[index].hasSolarData;
         }
-
         return true;
     }
 

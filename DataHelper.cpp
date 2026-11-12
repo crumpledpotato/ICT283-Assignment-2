@@ -10,11 +10,11 @@ namespace DataHelper
 {
     void PrepareWeatherData(WeatherlogType& weather_data, std::map<int, BinarySearchTree<WeatherRecType>>& weatherMap)
     {
-        cout << endl << "Sorting weather records" << endl << "." << endl << "." << endl << "." << endl;
+        cout << endl << "=== Sorting weather records ===" << endl << "." << endl << "." << endl << "." << endl;
         SortHelper::SortWeatherData(weather_data);
         cout << "Sorting completed" << endl;
 
-        cout << endl << "Removing duplicated records" << endl << "." << endl << "." << endl << "." << endl;
+        cout << endl << "=== Removing duplicated records ===" << endl << "." << endl << "." << endl << "." << endl;
         int duplicatesRemoved = SortHelper::RemoveDuplicates(weather_data);
         cout << "Duplicates removed : " << duplicatesRemoved << endl;
 

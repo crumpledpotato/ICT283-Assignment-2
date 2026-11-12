@@ -24,6 +24,8 @@ struct MonthlyStats
     float avgTemperature = 0.0f;
     float temperatureStdDeviation = 0.0f;
     float totalSolarRad = 0.0f;
+    float windMAD = 0.0f;
+    float temperatureMAD = 0.0f;
 
     bool hasWindData = false;
     bool hasTemperatureData = false;
@@ -78,36 +80,31 @@ namespace MathHelper
     bool CalculateTemperatureStats(const map<int, BinarySearchTree<WeatherRecType>>& weatherMap);
 
     /**
-     * @brief Calculates total solar radiation each month for a selected year
-     *
-     * Calculates the total solar radiation in kWh/m2, sorted by month for the selected year <br>
-     * The results are then displayed to the terminal
-     *
-     * @param weather_data The stored weather records
-     * @return True when statistics are successfully calculated, otherwise false
-     */
-    bool CalculateSolarRad(const WeatherlogType& weather_data);
-
-    /**
      * @brief Calculates monthly wind, temperature and solar statistics for a selected year
      *
      * Calculates the following statistics, sorted by month for the selected year:<br>
-     * - Average wind speed <br>
-     * - Wind speed standard deviation <br>
-     * - Average ambient air temperature <br>
-     * - Temperature standard deviation <br>
-     * - Total solar radiation <br>
+     * - Wind speed average value, sample standard deviation and Mean Absolute Deviation <br>
+     * - Ambient air temperature average value, sample standard deviation and Mean Absolute Deviation <br>
+     * - Total valid solar radiation <br>
      *
      * Months with blank data fields or missing data fields entirely will be skipped <br>
      * The results are then passed to FileHelper.cpp for export functions <br>
      * The results will not be displayed on the terminal
      *
-     * @param weather_data The stored weather records
+     * @param weatherMap Map containing yearly weather BSTs
      * @param inputYear The year selected for statistical calculations
      * @param monthlyStats Array storing statistics for each month
      * @return True when statistics are successfully calculated, otherwise false
      */
-    bool TabulateStatistics(const WeatherlogType& weather_data, int inputYear, MonthlyStats monthlyStats[]);
+    bool TabulateStatistics(const map<int, BinarySearchTree<WeatherRecType>>& weatherMap, int inputYear, MonthlyStats monthlyStats[]);
+
+    /**
+     * @brief Calculates the Mean Absolute Deviation (MAD).
+     * @param values Vector containing numerical observations.
+     * @param mean Arithmetic mean of the observations.
+     * @return Mean Absolute Deviation, or 0 if empty.
+     */
+    float CalculateMAD(const Vector<float>& values, float mean);
 
     /**
      * @struct SPCCResult
